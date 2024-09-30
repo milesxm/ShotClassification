@@ -1,13 +1,40 @@
-import torch
+import os 
 import numpy as np
 
-# Load your npy files
-keypoints = np.load('your_keypoints_file.npy')
+cover_drive_path = "Data\poselandmarks\coverdrives"
+pull_shot_path = "Data\poselandmarks\pullshots"
 
-# Convert to torch tensors
-keypoints_tensor = torch.tensor(keypoints)
 
-# Pad the sequence with zeros (or a specific value)
-padded_keypoints = torch.nn.functional.pad(keypoints_tensor, (0, 0, 0, max_length - keypoints_tensor.shape[0]))
+# Get all the keypoints in a list, to add more just add path to the list
+cover_drive_keypoints = [os.path.join(cover_drive_path, file) for file in os.listdir(cover_drive_path)]
+pull_shot_keypoints = [os.path.join(pull_shot_path, file) for file in os.listdir(pull_shot_path)]
 
-print(padded_keypoints.shape)  # Should now be consistent across all videos
+all_key_points = cover_drive_keypoints + pull_shot_keypoints
+
+max_frames = 0
+
+for keypoints in all_key_points:
+    keypoints = np.load(keypoints)
+    sequence_length = keypoints.shape[0]
+
+    if sequence_length > max_frames:
+        max_frames = sequence_length
+
+# Padding the videos
+
+def pad(data,max_frames):
+    seq_length = data.shape[0]
+
+    if seq_length < max_frames:
+        padding = np.zeros((max_frames - seq_length, data.shape[1], data.shape[2]))
+        data = np.vstack([data, padding])
+
+    return data
+
+
+for keypoints in all_key_points:
+    data = np.load(keypoints)
+    padded_keypoints = pad(data, max_frames)
+    np.save(keypoints, padded_keypoints)
+
+    print(f"Padded and saved {keypoints}")
