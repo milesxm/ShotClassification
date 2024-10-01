@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 
-class CricketShotClassifier(nn.module):
-    def__init__(self):
+class CricketShotClassifier(nn.Module):
+    def __init__(self):
         super(CricketShotClassifier,self).__init__()
 
         self.lstm = nn.LSTM(input_size = 51, hidden_size = 128, num_layers = 2, batch_first = True)
@@ -26,4 +26,3 @@ class CricketShotClassifier(nn.module):
 
         return x
 
-        
