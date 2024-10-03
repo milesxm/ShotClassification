@@ -70,8 +70,8 @@ landmark_dict = {
     32: "right foot index"
 }
 
-video_set_path = "Data\Videos\PullShots"
-output_data_path = "Data\poselandmarks\pullshots"
+video_set_path = "Data\Videos\CoverDrives"
+output_data_path = "Data\poselandmarks\coverdrives"
 model_path = "models\pose_landmarker_lite.task"
 
 vid_index = 0
@@ -95,8 +95,8 @@ for video in os.listdir(video_set_path):
     options = PoseLandmarkerOptions(base_options=BaseOptions(model_asset_path=model_path),
         running_mode=VisionRunningMode.VIDEO)
       
-    output_images_folder = "Data\poselandmarks\coverdrives"
-    outputpose_folder = "outputimages"
+    #output_images_folder = "Data\poselandmarks\coverdrives"
+    #outputpose_folder = "outputimages"
 
     video_keypoints = []
 

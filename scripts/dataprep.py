@@ -64,4 +64,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv1.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv2.pth")
