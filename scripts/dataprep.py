@@ -28,12 +28,14 @@ pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
 from torch.utils.data import ConcatDataset
 combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset])
 
-batch_size = 8
+batch_size = 16
 dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 
-model = CricketShotClassifier()
+model = CricketShotClassifier().to("cuda")
 
-criterion = torch.nn.CrossEntropyLoss()
+
+class_weights = torch.tensor([0.4,0.6]).to("cuda")
+criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 num_epochs = 100
@@ -46,6 +48,10 @@ for epoch in range(num_epochs):
     total = 0
 
     for inputs, labels in dataloader:
+
+        inputs = inputs.to("cuda")
+        labels = labels.to("cuda")
+
         optimizer.zero_grad()
 
         outputs = model(inputs)

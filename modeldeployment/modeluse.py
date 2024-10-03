@@ -12,7 +12,6 @@ from mediapipe.tasks.python import vision
 from mediapipe import solutions
 
 
-
 def process_new_vid(video_path, media_pipe_model_path):
     model_path = media_pipe_model_path
     video_path = video_path
@@ -81,8 +80,8 @@ def process_new_vid(video_path, media_pipe_model_path):
 class CricketShotClassifier(nn.Module):
     def __init__(self):
         super(CricketShotClassifier, self).__init__()
-        self.lstm = nn.LSTM(input_size=51, hidden_size=128, num_layers=2, batch_first=True)
-        self.fc1 = nn.Linear(128, 64)
+        self.lstm = nn.LSTM(input_size=51, hidden_size=256, num_layers=2, batch_first=True)
+        self.fc1 = nn.Linear(256, 64)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(64, 2)  # Two shot types (cover drive, pull shot)
         self.softmax = nn.Softmax(dim=1)
@@ -98,7 +97,7 @@ class CricketShotClassifier(nn.Module):
 
 # Load the model
 model = CricketShotClassifier()
-model.load_state_dict(torch.load('cricketshotclassifierv1.pth'))
+model.load_state_dict(torch.load('cricketshotclassifierv2.pth'))
 model.eval()
 
 
@@ -118,10 +117,12 @@ def pad_vid(keypoints, max_frames = 109):
     return keypoints
 
 
-video_path = "pathtovideo.mp4"
+video_path = "coaster2.mp4"
 
 #can choose model here
 video_keypoints = process_new_vid(video_path, "models\pose_landmarker_lite.task")
+
+print(video_keypoints.shape)
 
 
 

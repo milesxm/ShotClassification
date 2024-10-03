@@ -70,8 +70,8 @@ landmark_dict = {
     32: "right foot index"
 }
 
-video_set_path = "Data\Videos\CoverDrives"
-output_data_path = "Data\poselandmarks\coverdrives"
+video_set_path = "Data\Videos\PullShots"
+output_data_path = "Data\poselandmarks\pullshots"
 model_path = "models\pose_landmarker_lite.task"
 
 vid_index = 0
