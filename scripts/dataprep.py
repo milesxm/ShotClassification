@@ -19,14 +19,20 @@ class CricketShotDataset(Dataset):
         shot_data = shot_data.reshape(shot_data.shape[0], -1)
         return torch.tensor(shot_data,dtype=torch.float32), torch.tensor(self.shot_label, dtype=torch.long)
 
+#Path to data
 cover_drive_path = "Data\poselandmarks\coverdrives"
 pull_shot_path = "Data\poselandmarks\pullshots"
+augmented_cover_drive_path = "Data\poselandmarks\coverdrivesaugmented"
+augmented_pull_shot_path = "Data\poselandmarks\pullshotsaugmented"
 
 cover_drives_dataset = CricketShotDataset(cover_drive_path, 0)
 pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
+augmented_cover_drives_dataset = CricketShotDataset(augmented_cover_drive_path, 0)
+augmented_pull_shots_dataset = CricketShotDataset(augmented_pull_shot_path, 1)
+
 
 from torch.utils.data import ConcatDataset
-combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset])
+combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augmented_cover_drives_dataset, augmented_pull_shots_dataset])
 
 batch_size = 16
 dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
@@ -38,7 +44,7 @@ class_weights = torch.tensor([0.4,0.6]).to("cuda")
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-num_epochs = 100
+num_epochs = 1000
 
 for epoch in range(num_epochs):
     model.train()
@@ -70,4 +76,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv2.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv3.pth")
