@@ -97,7 +97,7 @@ class CricketShotClassifier(nn.Module):
 
 # Load the model
 model = CricketShotClassifier()
-model.load_state_dict(torch.load('cricketshotclassifierv2.pth'))
+model.load_state_dict(torch.load('cricketshotclassifierv3.pth'))
 model.eval()
 
 
@@ -117,7 +117,7 @@ def pad_vid(keypoints, max_frames = 109):
     return keypoints
 
 
-video_path = "coaster2.mp4"
+video_path = "capture1.mp4"
 
 #can choose model here
 video_keypoints = process_new_vid(video_path, "models\pose_landmarker_lite.task")
