@@ -2,7 +2,7 @@ import numpy as np
 import os
 
 # Path where your .npy files are stored
-output_data_path = "Data\poselandmarks\coverdrives"
+output_data_path = "Data\poselandmarks\cutshots"
 
 # List all .npy files
 npy_files = [f for f in os.listdir(output_data_path) if f.endswith('.npy')]

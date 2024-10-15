@@ -3,13 +3,16 @@ import numpy as np
 
 cover_drive_path = "Data\poselandmarks\coverdrives"
 pull_shot_path = "Data\poselandmarks\pullshots"
-
+cut_shot_path = "Data\poselandmarks\cutshots"
+cut_shot_augmented_path = "Data\poselandmarks\cutshotsaugmented"
 
 # Get all the keypoints in a list, to add more just add path to the list
 cover_drive_keypoints = [os.path.join(cover_drive_path, file) for file in os.listdir(cover_drive_path)]
 pull_shot_keypoints = [os.path.join(pull_shot_path, file) for file in os.listdir(pull_shot_path)]
+cut_shot_keypoints = [os.path.join(cut_shot_path, file) for file in os.listdir(cut_shot_path)]
+cut_shot_augmented_keypoints = [os.path.join(cut_shot_augmented_path, file) for file in os.listdir(cut_shot_augmented_path)]
 
-all_key_points = cover_drive_keypoints + pull_shot_keypoints
+all_key_points = cover_drive_keypoints + pull_shot_keypoints + cut_shot_keypoints + cut_shot_augmented_keypoints
 
 max_frames = 0
 
