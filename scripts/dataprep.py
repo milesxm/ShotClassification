@@ -22,17 +22,23 @@ class CricketShotDataset(Dataset):
 #Path to data
 cover_drive_path = "Data\poselandmarks\coverdrives"
 pull_shot_path = "Data\poselandmarks\pullshots"
+cut_shot_path = "Data\poselandmarks\cutshots"
 augmented_cover_drive_path = "Data\poselandmarks\coverdrivesaugmented"
 augmented_pull_shot_path = "Data\poselandmarks\pullshotsaugmented"
+augmented_cut_shot_path = "Data\poselandmarks\cutshotsaugmented"
+
 
 cover_drives_dataset = CricketShotDataset(cover_drive_path, 0)
 pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
+cut_shots_dataset = CricketShotDataset(cut_shot_path, 2)
 augmented_cover_drives_dataset = CricketShotDataset(augmented_cover_drive_path, 0)
 augmented_pull_shots_dataset = CricketShotDataset(augmented_pull_shot_path, 1)
+augmented_cut_shots_dataset = CricketShotDataset(augmented_cut_shot_path, 2)
 
 
 from torch.utils.data import ConcatDataset
-combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augmented_cover_drives_dataset, augmented_pull_shots_dataset])
+combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augmented_cover_drives_dataset, augmented_pull_shots_dataset, 
+                                  cut_shots_dataset, augmented_cut_shots_dataset])
 
 batch_size = 16
 dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
@@ -40,7 +46,7 @@ dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 model = CricketShotClassifier().to("cuda")
 
 
-class_weights = torch.tensor([0.4,0.6]).to("cuda")
+class_weights = torch.tensor([0.31,0.36,0.33]).to("cuda")
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -76,4 +82,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv3.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv4.pth")
