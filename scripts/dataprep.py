@@ -26,14 +26,24 @@ cut_shot_path = "Data\poselandmarks\cutshots"
 augmented_cover_drive_path = "Data\poselandmarks\coverdrivesaugmented"
 augmented_pull_shot_path = "Data\poselandmarks\pullshotsaugmented"
 augmented_cut_shot_path = "Data\poselandmarks\cutshotsaugmented"
+cover_drive_flipped_path = "Data\poselandmarks\coverdrivesflipped"
+pull_shot_flipped_path = "Data\poselandmarks\pullshotsflipped"
+cut_shot_flipped_path = "Data\poselandmarks\cutshotsflipped"
 
-
+# Adding the original keypoints to the dataset
 cover_drives_dataset = CricketShotDataset(cover_drive_path, 0)
 pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
 cut_shots_dataset = CricketShotDataset(cut_shot_path, 2)
+
+# Adding the augmented keypoints to the dataset
 augmented_cover_drives_dataset = CricketShotDataset(augmented_cover_drive_path, 0)
 augmented_pull_shots_dataset = CricketShotDataset(augmented_pull_shot_path, 1)
 augmented_cut_shots_dataset = CricketShotDataset(augmented_cut_shot_path, 2)
+
+# Adding the flipped keypoints to the dataset
+cover_drives_flipped_dataset = CricketShotDataset(cover_drive_flipped_path, 0)
+pull_shots_flipped_dataset = CricketShotDataset(pull_shot_flipped_path, 1)
+cut_shots_flipped_dataset = CricketShotDataset(cut_shot_flipped_path, 2)
 
 
 from torch.utils.data import ConcatDataset
@@ -82,4 +92,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv4.1.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv4.2.pth")
