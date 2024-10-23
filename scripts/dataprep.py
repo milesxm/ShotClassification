@@ -23,6 +23,7 @@ class CricketShotDataset(Dataset):
 cover_drive_path = "Data\poselandmarks\coverdrives"
 pull_shot_path = "Data\poselandmarks\pullshots"
 cut_shot_path = "Data\poselandmarks\cutshots"
+sweep_shot_path = "Data\poselandmarks\sweepshots"
 augmented_cover_drive_path = "Data\poselandmarks\coverdrivesaugmented"
 augmented_pull_shot_path = "Data\poselandmarks\pullshotsaugmented"
 augmented_cut_shot_path = "Data\poselandmarks\cutshotsaugmented"
@@ -34,6 +35,7 @@ cut_shot_flipped_path = "Data\poselandmarks\cutshotsflipped"
 cover_drives_dataset = CricketShotDataset(cover_drive_path, 0)
 pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
 cut_shots_dataset = CricketShotDataset(cut_shot_path, 2)
+sweep_shots_dataset = CricketShotDataset(sweep_shot_path, 3)
 
 # Adding the augmented keypoints to the dataset
 augmented_cover_drives_dataset = CricketShotDataset(augmented_cover_drive_path, 0)
@@ -56,7 +58,7 @@ dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 model = CricketShotClassifier().to("cuda")
 
 
-class_weights = torch.tensor([0.31,0.36,0.33]).to("cuda")
+class_weights = torch.tensor([0.24,0.28,0.30,0.18]).to("cuda")
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
