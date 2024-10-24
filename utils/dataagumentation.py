@@ -10,8 +10,8 @@ def guassian_noise(keypoints, noise_std):
 
 cover_drive_path = "Data\poselandmarks\coverdrivesflipped"
 pull_shot_path = "Data\poselandmarks\pullshotsflipped"
-cutshot_path = "Data\poselandmarks\cutshots"
-swepshot_path = "Data\poselandmarks\sweepshots"
+cutshot_path = "Data\poselandmarks\cutshotsflipped"
+swepshot_path = "Data\poselandmarks\sweepshotsflipped"
 
 cover_drive_keypoints = [os.path.join(cover_drive_path, file) for file in os.listdir(cover_drive_path)]
 pull_shot_keypoints = [os.path.join(pull_shot_path, file) for file in os.listdir(pull_shot_path)]   
@@ -44,9 +44,9 @@ keypoints_idx = 0
     #print(f"Added noise to {noisy_keypoints}")
     #keypoints_idx += 1
 
-for keypoints in pull_shot_keypoints:
+for keypoints in sweep_shot_keypoints:
     data = np.load(keypoints)
     noisy_keypoints = guassian_noise(data, 0.05)
-    np.save(f'Data\poselandmarks\pullshotsflippedaugmented\psfa{keypoints_idx}', noisy_keypoints)
+    np.save(f'Data\poselandmarks\sweepshotsflippedaugmented\sfa{keypoints_idx}', noisy_keypoints)
     print(f"Added noise to {noisy_keypoints}")
     keypoints_idx += 1
