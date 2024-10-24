@@ -23,32 +23,51 @@ class CricketShotDataset(Dataset):
 cover_drive_path = "Data\poselandmarks\coverdrives"
 pull_shot_path = "Data\poselandmarks\pullshots"
 cut_shot_path = "Data\poselandmarks\cutshots"
+sweep_shot_path = "Data\poselandmarks\sweepshots"
 augmented_cover_drive_path = "Data\poselandmarks\coverdrivesaugmented"
 augmented_pull_shot_path = "Data\poselandmarks\pullshotsaugmented"
 augmented_cut_shot_path = "Data\poselandmarks\cutshotsaugmented"
+augmented_sweep_shot_path = "Data\poselandmarks\sweepshotsaugmented"
 cover_drive_flipped_path = "Data\poselandmarks\coverdrivesflipped"
 pull_shot_flipped_path = "Data\poselandmarks\pullshotsflipped"
 cut_shot_flipped_path = "Data\poselandmarks\cutshotsflipped"
+sweep_shot_flipped_path = "Data\poselandmarks\sweepshotsflipped"
+augmented_cover_drive_flipped_path = "Data\poselandmarks\coverdrivesflippedaugmented"
+augmented_pull_shot_flipped_path = "Data\poselandmarks\pullshotsflippedaugmented"
+augmented_cut_shot_flipped_path = "Data\poselandmarks\cutshotsflippedaugmented"
+augmented_sweep_shot_flipped_path = "Data\poselandmarks\sweepshotsflippedaugmented"
+
 
 # Adding the original keypoints to the dataset
 cover_drives_dataset = CricketShotDataset(cover_drive_path, 0)
 pull_shots_dataset = CricketShotDataset(pull_shot_path, 1)
 cut_shots_dataset = CricketShotDataset(cut_shot_path, 2)
+sweep_shots_dataset = CricketShotDataset(sweep_shot_path, 3)
 
 # Adding the augmented keypoints to the dataset
 augmented_cover_drives_dataset = CricketShotDataset(augmented_cover_drive_path, 0)
 augmented_pull_shots_dataset = CricketShotDataset(augmented_pull_shot_path, 1)
 augmented_cut_shots_dataset = CricketShotDataset(augmented_cut_shot_path, 2)
+augmented_sweep_shots_dataset = CricketShotDataset(augmented_sweep_shot_path, 3)
 
 # Adding the flipped keypoints to the dataset
 cover_drives_flipped_dataset = CricketShotDataset(cover_drive_flipped_path, 0)
 pull_shots_flipped_dataset = CricketShotDataset(pull_shot_flipped_path, 1)
 cut_shots_flipped_dataset = CricketShotDataset(cut_shot_flipped_path, 2)
+sweep_shots_flipped_dataset = CricketShotDataset(sweep_shot_flipped_path, 3)
+
+# Adding the augmented flipped keypoints to the dataset
+augmented_cover_drives_flipped_dataset = CricketShotDataset(augmented_cover_drive_flipped_path, 0)
+augmented_pull_shots_flipped_dataset = CricketShotDataset(augmented_pull_shot_flipped_path, 1)
+augmented_cut_shots_flipped_dataset = CricketShotDataset(augmented_cut_shot_flipped_path, 2)
+augmented_sweep_shots_flipped_dataset = CricketShotDataset(augmented_sweep_shot_flipped_path, 3)
 
 
 from torch.utils.data import ConcatDataset
 combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augmented_cover_drives_dataset, augmented_pull_shots_dataset, 
-                                  cut_shots_dataset, augmented_cut_shots_dataset])
+                                  cut_shots_dataset, augmented_cut_shots_dataset, sweep_shots_dataset, augmented_sweep_shots_dataset, cover_drives_flipped_dataset, 
+                                  pull_shots_flipped_dataset, augmented_cover_drives_flipped_dataset, augmented_pull_shots_flipped_dataset, cut_shots_flipped_dataset, 
+                                  augmented_cut_shots_flipped_dataset, sweep_shots_flipped_dataset, augmented_sweep_shots_flipped_dataset])
 
 batch_size = 16
 dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
@@ -56,11 +75,12 @@ dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 model = CricketShotClassifier().to("cuda")
 
 
-class_weights = torch.tensor([0.31,0.36,0.33]).to("cuda")
+class_weights = torch.tensor([0.24,0.28,0.30,0.18]).to("cuda")
 criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 num_epochs = 1000
+max_grad_norm = 1.0
 
 for epoch in range(num_epochs):
     model.train()
@@ -80,6 +100,9 @@ for epoch in range(num_epochs):
         loss = criterion(outputs, labels)
 
         loss.backward()
+
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+
         optimizer.step()
 
         running_loss += loss.item()
@@ -92,4 +115,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv4.2.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv5.1.pth")

@@ -82,7 +82,7 @@ class CricketShotClassifier(nn.Module):
         self.lstm = nn.LSTM(input_size=51, hidden_size=256, num_layers=2, batch_first=True)
         self.fc1 = nn.Linear(256, 64)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(64, 3)  # Two shot types (cover drive, pull shot)
+        self.fc2 = nn.Linear(64, 4)  # Two shot types (cover drive, pull shot)
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
@@ -96,7 +96,7 @@ class CricketShotClassifier(nn.Module):
 
 # Load the model
 model = CricketShotClassifier()
-model.load_state_dict(torch.load('cricketshotclassifierv4.2.pth'))
+model.load_state_dict(torch.load('cricketshotclassifierv5.0.pth'))
 model.eval()
 
 
@@ -116,7 +116,7 @@ def pad_vid(keypoints, max_frames = 109):
     return keypoints
 
 
-video_path = "Lefty Cut.mp4"
+video_path = "sweepcrawley.mp4"
 
 #can choose model here
 video_keypoints = process_new_vid(video_path, "models\pose_landmarker_heavy.task")
@@ -150,5 +150,10 @@ if predicted_class == 0:
     print(f"Cover Drive with {confidence:.2f}% confidence")
 elif predicted_class == 1:
     print(f"Pull Shot with {confidence:.2f}% confidence")
-else:
+elif predicted_class == 2:
     print(f"Cut Shot with {confidence:.2f}% confidence")
+elif predicted_class == 3:
+    print(f"Sweep Shot with {confidence:.2f}% confidence")
+else:
+    print("Unknown shot type")
+    print(prediction)

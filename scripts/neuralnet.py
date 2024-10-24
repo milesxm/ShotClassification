@@ -11,7 +11,7 @@ class CricketShotClassifier(nn.Module):
 
         self.fc1 = nn.Linear(256, 64)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(64, 3) # Output layer for the two shot types
+        self.fc2 = nn.Linear(64, 4) # Output layer for the four shot types
         self.softmax = nn.Softmax(dim = 1)
 
     def forward(self, x):

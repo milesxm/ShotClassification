@@ -72,8 +72,8 @@ landmark_dict = {
 
 
 # To convert the vids to keypoints change paths accordingly
-video_set_path = "Data\Videos\PullShotsFlipped"
-output_data_path = "Data\poselandmarks\pullshotsflipped"
+video_set_path = "Data\Videos\SweepShotsFlipped"
+output_data_path = "Data\poselandmarks\sweepshotsflipped"
 model_path = "models\pose_landmarker_lite.task"
 
 vid_index = 0
@@ -133,7 +133,7 @@ for video in os.listdir(video_set_path):
     
     video_keypoints = np.array(video_keypoints)
 
-    output_file_path = os.path.join(output_data_path, f"pf{vid_index}.npy")
+    output_file_path = os.path.join(output_data_path, f"sf{vid_index}.npy")
     np.save(output_file_path, video_keypoints)
 
     print(f"Saved keypoints for {vid_index} to {output_file_path}")
