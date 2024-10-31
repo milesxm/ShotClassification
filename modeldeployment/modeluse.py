@@ -88,7 +88,9 @@ def process_new_vid(video_path, media_pipe_model_path):
 
                 video_keypoints.append(frame_keypoints)
 
-            cv2.imshow("Pose Detection", annotated_image)
+
+            resizedimg = cv2.resize(annotated_image, (1280, 720))
+            cv2.imshow("Pose Detection", resizedimg)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             timestamp_ms += 1/fps
@@ -144,7 +146,7 @@ def pad_vid(keypoints, max_frames = 109):
     return keypoints
 
 
-video_path = "comma2.mp4"
+video_path = "coaster1.mp4"
 
 #can choose model here
 video_keypoints = process_new_vid(video_path, "models\pose_landmarker_heavy.task")
