@@ -3,6 +3,9 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from neuralnet import CricketShotClassifier
+import matplotlib.pyplot as plt
+
+loss_record = []
 
 class CricketShotDataset(Dataset):
     def __init__(self, shot_folder, shot_label):
@@ -71,18 +74,18 @@ combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augm
 
 
 # Examples used before the model relearns 
-batch_size = 16
+batch_size = 32
 dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 
 # Creating the model and using gpu
 model = CricketShotClassifier().to("cuda")
 
 # Weighting the classes for the small dataset
-class_weights = torch.tensor([0.24,0.28,0.30,0.18]).to("cuda")
-criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
+#class_weights = torch.tensor([0.24,0.28,0.30,0.18]).to("cuda")
+criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-num_epochs = 5000
+num_epochs = 2000
 max_grad_norm = 1.0
 
 for epoch in range(num_epochs):
@@ -94,7 +97,6 @@ for epoch in range(num_epochs):
     total = 0
 
     for inputs, labels in dataloader:
-
         inputs = inputs.to("cuda")
         labels = labels.to("cuda")
 
@@ -120,8 +122,14 @@ for epoch in range(num_epochs):
         correct += (predicted == labels).sum().item()
 
     epoch_loss = running_loss / len(dataloader)
+    loss_record.append(epoch_loss)
     epoch_acc = correct / total * 100
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
 
 
-torch.save(model.state_dict(), "cricketshotclassifierv5.1.pth")
+plt.plot(loss_record)
+plt.title("Loss over epochs")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.show()
+torch.save(model.state_dict(), "cricketshotclassifierv5.3noweights.pth")
