@@ -5,7 +5,7 @@
 - Cover Drives, Pull Shots, Backfoot Cuts and Sweep Shots.
 - Input video length 5 seconds
 
-![Mediapipe](misc\pics\sequenceshots.png)
+![Mediapipe](misc/pics/sequenceshots.png)
 Cover Drive sequence
 
 ## Future Additions ##
