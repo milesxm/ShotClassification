@@ -3,6 +3,7 @@ import os
 import torch
 import mediapipe as mp
 import cv2
+from matplotlib import pyplot as plt
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +11,28 @@ import torch.nn.functional as F
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe import solutions
+from mediapipe.framework.formats import landmark_pb2
+
+def draw_landmarks_on_image(rgb_image, detection_result):
+  pose_landmarks_list = detection_result.pose_landmarks
+  annotated_image = np.copy(rgb_image)
+
+  # Loop through the detected poses to visualize.
+  for idx in range(len(pose_landmarks_list)):
+    pose_landmarks = pose_landmarks_list[idx]
+
+    # Draw the pose landmarks.
+    pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+    pose_landmarks_proto.landmark.extend([
+      landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in pose_landmarks
+    ])
+    solutions.drawing_utils.draw_landmarks(
+      annotated_image,
+      pose_landmarks_proto,
+      solutions.pose.POSE_CONNECTIONS,
+      solutions.drawing_styles.get_default_pose_landmarks_style())
+  return annotated_image
+
 
 def process_new_vid(video_path, media_pipe_model_path):
     model_path = media_pipe_model_path
@@ -48,6 +71,8 @@ def process_new_vid(video_path, media_pipe_model_path):
             shape = mp_image.numpy_view().shape
 
             result = landmarker.detect_for_video(mp_image, timestamp_ms = int(timestamp_ms * 1000/fps))
+
+            annotated_image = draw_landmarks_on_image(mp_image.numpy_view(), result)
             
             normalised_coords = []
 
@@ -63,6 +88,11 @@ def process_new_vid(video_path, media_pipe_model_path):
 
                 video_keypoints.append(frame_keypoints)
 
+
+            resizedimg = cv2.resize(annotated_image, (1280, 720))
+            cv2.imshow("Pose Detection", resizedimg)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
             timestamp_ms += 1/fps
             frame_num += 1
 
@@ -96,7 +126,7 @@ class CricketShotClassifier(nn.Module):
 
 # Load the model
 model = CricketShotClassifier()
-model.load_state_dict(torch.load('cricketshotclassifierv5.0.pth'))
+model.load_state_dict(torch.load('cricketshotclassifierv5.3noweights.pth'))
 model.eval()
 
 
@@ -116,7 +146,7 @@ def pad_vid(keypoints, max_frames = 109):
     return keypoints
 
 
-video_path = "sweepcrawley.mp4"
+video_path = "comma29.mp4"
 
 #can choose model here
 video_keypoints = process_new_vid(video_path, "models\pose_landmarker_heavy.task")
@@ -141,7 +171,6 @@ with torch.no_grad():
     predicted_class = torch.argmax(prediction, dim=1)
 
     
-
     # Get the confidence for the predicted class
     confidence = prediction[0][predicted_class].item() * 100  # Multiply by 100 to get percentage
 
