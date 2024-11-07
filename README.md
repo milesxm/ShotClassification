@@ -3,7 +3,7 @@
 ## Current Capabilities ##
 
 - Cover Drives, Pull Shots, Backfoot Cuts and Sweep Shots.
-- Input video length 5 seconds
+- Input video length 3 seconds @30fps
 
 ![Mediapipe](misc\pics\sequenceshots.png)
 ![](misc\pics\resultofshot.png)
