@@ -6,7 +6,8 @@
 - Input video length 5 seconds
 
 ![Mediapipe](misc\pics\sequenceshots.png)
-Cover Drive sequence
+![](misc\pics\resultofshot.png)
+Cover Drive sequence with result in terminal shown
 
 ## Future Additions ##
 - Increased number of shots
