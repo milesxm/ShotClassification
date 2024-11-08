@@ -170,3 +170,22 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.show()
 torch.save(model.state_dict(), "cricketshotclassifierv6.2noweights.pth")
+
+#testing model
+
+model.eval()
+correct_test = 0
+total_test = 0
+
+with torch.no_grad():
+    for inputs, labels in test_dataloader:
+        inputs = inputs.to("cuda")
+        labels = labels.to("cuda")
+
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+        total_test += labels.size(0)
+        correct_test += (predicted == labels).sum().item()
+
+test_accuracy = correct_test / total_test * 100
+print(f"Test Accuracy: {test_accuracy:.2f}%")
