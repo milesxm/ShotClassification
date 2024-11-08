@@ -1,11 +1,15 @@
 import os 
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, ConcatDataset, random_split
 from neuralnet import CricketShotClassifier
 import matplotlib.pyplot as plt
 
-loss_record = []
+train_fraction = 0.7
+val_fraction = 0.2
+test_fraction = 0.1
+
+train_loss_record = []
 
 class CricketShotDataset(Dataset):
     def __init__(self, shot_folder, shot_label):
@@ -66,16 +70,26 @@ augmented_cut_shots_flipped_dataset = CricketShotDataset(augmented_cut_shot_flip
 augmented_sweep_shots_flipped_dataset = CricketShotDataset(augmented_sweep_shot_flipped_path, 3)
 
 
-from torch.utils.data import ConcatDataset
 combined_dataset = ConcatDataset([cover_drives_dataset, pull_shots_dataset, augmented_cover_drives_dataset, augmented_pull_shots_dataset, 
                                   cut_shots_dataset, augmented_cut_shots_dataset, sweep_shots_dataset, augmented_sweep_shots_dataset, cover_drives_flipped_dataset, 
                                   pull_shots_flipped_dataset, augmented_cover_drives_flipped_dataset, augmented_pull_shots_flipped_dataset, cut_shots_flipped_dataset, 
                                   augmented_cut_shots_flipped_dataset, sweep_shots_flipped_dataset, augmented_sweep_shots_flipped_dataset])
 
 
+
+total_length = len(combined_dataset)
+
+train_length = int(train_fraction * total_length)
+val_length = int(val_fraction * total_length)
+test_length = total_length - train_length - val_length
+
+train_dataset, val_dataset, test_dataset = random_split(combined_dataset, [train_length, val_length, test_length])
+
 # Examples used before the model relearns 
 batch_size = 32
-dataloader = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # Creating the model and using gpu
 model = CricketShotClassifier().to("cuda")
@@ -93,10 +107,10 @@ for epoch in range(num_epochs):
     model.train()
 
     running_loss = 0.0
-    correct = 0
-    total = 0
+    correct_train = 0
+    total_train = 0
 
-    for inputs, labels in dataloader:
+    for inputs, labels in train_dataloader:
         inputs = inputs.to("cuda")
         labels = labels.to("cuda")
 
@@ -118,18 +132,60 @@ for epoch in range(num_epochs):
         # gets current loss
         running_loss += loss.item()
         _, predicted = torch.max(outputs, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        total_train += labels.size(0)
+        correct_train += (predicted == labels).sum().item()
 
-    epoch_loss = running_loss / len(dataloader)
-    loss_record.append(epoch_loss)
-    epoch_acc = correct / total * 100
-    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_acc:.2f}%")
+    train_loss = running_loss / len(train_dataloader)
+    train_loss_record.append(train_loss)
+    train_accuracy = correct_train / total_train * 100
+
+    # Validation
+    model.eval()
+    running_loss_val = 0.0
+    correct_val = 0
+    total_val = 0
+
+    with torch.no_grad():
+        for inputs, labels in val_dataloader:
+            inputs = inputs.to("cuda")
+            labels = labels.to("cuda")
+
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+
+            running_loss_val += loss.item()
+            _, predicted = torch.max(outputs, 1)
+            total_val += labels.size(0)
+            correct_val += (predicted == labels).sum().item()
+
+    val_loss = running_loss_val / len(val_dataloader)
+    val_accuracy = correct_val / total_val * 100
+
+    print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.2f}%, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.2f}%")
 
 
-plt.plot(loss_record)
+plt.plot(train_loss_record)
 plt.title("Loss over epochs")
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.show()
-torch.save(model.state_dict(), "cricketshotclassifierv5.3noweights.pth")
+torch.save(model.state_dict(), "cricketshotclassifierv6.2noweights.pth")
+
+#testing model
+
+model.eval()
+correct_test = 0
+total_test = 0
+
+with torch.no_grad():
+    for inputs, labels in test_dataloader:
+        inputs = inputs.to("cuda")
+        labels = labels.to("cuda")
+
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+        total_test += labels.size(0)
+        correct_test += (predicted == labels).sum().item()
+
+test_accuracy = correct_test / total_test * 100
+print(f"Test Accuracy: {test_accuracy:.2f}%")
